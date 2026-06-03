@@ -1,7 +1,19 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import numpy as np
+from fastapi.middleware.cors import CORSMiddleware
 
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://cost-to-be-the-boss-vue.vercel.app",
+                "http://localhost:3000",
+                ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class RecipeInput(BaseModel):
     name: str
@@ -19,8 +31,6 @@ class SimulationResponse(BaseModel):
     bestCase: float
     worstCase: float
     realisticRange: list[float]
-
-app = FastAPI()
 
 @app.get("/")
 def read_root():
