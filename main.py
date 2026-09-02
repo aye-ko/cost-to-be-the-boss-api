@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 import numpy as np
 from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
 
@@ -65,3 +66,9 @@ def simulate(request: SimulationRequest) -> SimulationResponse:
         worstCase = float(worstCase),
         realisticRange=[float(realisticRange[0]), float(realisticRange[1])]
     )
+    
+
+@app.post("/ocr")
+
+def ocr(file: UploadFile = File(r'C:\Users\16618\OneDrive\Pictures\Screenshots\ingredients_for_parser.png')):
+    return {"lines": ["test line"]}
