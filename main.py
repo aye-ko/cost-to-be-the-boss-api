@@ -75,7 +75,7 @@ def simulate(request: SimulationRequest) -> SimulationResponse:
         realisticRange=[float(realisticRange[0]), float(realisticRange[1])]
     )
     
-
+# Paddle OCR
 @app.post("/ocr")
 
 def ocr(file: UploadFile = File(...)):
