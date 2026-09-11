@@ -1,9 +1,18 @@
-from fastapi import FastAPI
+import os
+os.environ["PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT"] = "0"
+
+from fastapi import FastAPI, UploadFile, File
 from pydantic import BaseModel
 import numpy as np
 from fastapi.middleware.cors import CORSMiddleware
+import tempfile
+from paddleocr import PaddleOCR
+
 
 app = FastAPI()
+
+ocr_engine = PaddleOCR(use_textline_orientation=True, lang='en')
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -65,3 +74,19 @@ def simulate(request: SimulationRequest) -> SimulationResponse:
         worstCase = float(worstCase),
         realisticRange=[float(realisticRange[0]), float(realisticRange[1])]
     )
+    
+# Paddle OCR
+@app.post("/ocr")
+
+def ocr(file: UploadFile = File(...)):
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmp:
+        tmp.write(file.file.read())   # the uploads byes onto disk
+        path =tmp.name  # remember where it is
+    try:
+        result = ocr_engine.predict(path)
+        lines = []
+        for res in result:
+            lines.extend(res['rec_texts'])
+        return {"lines": lines}
+    finally:
+        os.remove(path)
